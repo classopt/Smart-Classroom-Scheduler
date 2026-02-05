@@ -1,1 +1,9 @@
 .idea/
+venv/
+.venv/
+__pycache__/
+*.pyc
+.env
+instance/
+.DS_Store
+*.log
