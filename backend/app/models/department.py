@@ -7,4 +7,7 @@ class Department(db.Model):
     code = db.Column(db.String(10), unique=True, nullable=False)
 
     courses = db.relationship('Course', backref='department', lazy=True)
-    teachers = db.relationship('Teacher', backref='department', lazy=True)
+    programs = db.relationship('Program', backref='department', lazy=True)
+
+    def __repr__(self):
+        return f'<Department {self.code}>'
