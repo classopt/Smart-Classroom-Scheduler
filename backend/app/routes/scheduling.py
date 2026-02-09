@@ -1,5 +1,6 @@
 from flask import Blueprint, request, jsonify
-from ..models import db, Workload, Teacher, Course, Section, Room
+from ..models import Workload, Teacher, Course, Section, Room
+from .. import db
 from datetime import datetime
 
 scheduling_bp = Blueprint('scheduling', __name__)
