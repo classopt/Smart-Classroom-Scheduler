@@ -27,31 +27,36 @@ def seed():
         db.session.add(batch_23)
         db.session.commit()
         
-        sec_a = Section(name="Sec A", batch_id=batch_23.id)
-        sec_b = Section(name="Sec B", batch_id=batch_23.id)
+        sec_a = Section(name="Sec A", batch_id=batch_23.id, student_count=45)
+        sec_b = Section(name="Sec B", batch_id=batch_23.id, student_count=20)
         db.session.add_all([sec_a, sec_b])
 
         print("Seeding Courses...")
-        python_course = Course(name="Python Programming", code="IT101", credits=4, department_id=it_dept.id)
-        db.session.add(python_course)
+        python_course = Course(name="Python Programming", code="IT101", credits=4, department_id=it_dept.id, course_type="Theory")
+        lab_course = Course(name="Database Lab", code="IT102", credits=2, department_id=it_dept.id, course_type="Lab")
+        db.session.add_all([python_course, lab_course])
         db.session.commit()
 
         print("Seeding Teachers...")
         prof_ajay = Teacher(name="Prof. Ajay", email="ajay@university.edu")
         prof_ajay.departments.append(it_dept)
-        # Ajay is qualified for Python
         prof_ajay.qualified_courses.append(python_course)
+        # Ajay is only available Monday and Tuesday morning
+        prof_ajay.availability = {
+            "Monday": ["09:00-10:00", "10:00-11:00"],
+            "Tuesday": ["09:00-10:00"]
+        }
         
         prof_kumar = Teacher(name="Prof. Kumar", email="kumar@university.edu")
         prof_kumar.departments.append(cs_dept)
-        # Kumar is NOT qualified for Python (experimental test)
         
         db.session.add_all([prof_ajay, prof_kumar])
 
         print("Seeding Rooms...")
         room101 = Room(name="Room 101", capacity=60, room_type="Classroom")
+        room102 = Room(name="Room 102", capacity=25, room_type="Classroom")
         lab1 = Room(name="IT Lab 1", capacity=30, room_type="Lab")
-        db.session.add_all([room101, lab1])
+        db.session.add_all([room101, room102, lab1])
 
         db.session.commit()
         print("Seeding completed successfully!")

@@ -1,5 +1,5 @@
 from flask import Blueprint, request, jsonify
-from ..models import Department, Program, Batch, Section, Teacher, Course
+from ..models import Department, Program, Batch, Section, Teacher, Course, Room
 from .. import db
 
 resources_bp = Blueprint('resources', __name__)
@@ -80,7 +80,9 @@ def get_teachers():
     dept_id = request.args.get('department_id')
     if dept_id:
         # Get teachers associated with this department via many-to-many
-        dept = Department.query.get_or_404(dept_id)
+        dept = db.session.get(Department, dept_id)
+        if not dept:
+            return jsonify({'error': 'Department not found'}), 404
         teachers = dept.teachers.all()
     else:
         teachers = Teacher.query.all()
@@ -105,7 +107,7 @@ def add_teacher():
     # Handle departmental associations
     if 'department_ids' in data:
         for d_id in data['department_ids']:
-            dept = Department.query.get(d_id)
+            dept = db.session.get(Department, d_id)
             if dept:
                 new_teacher.departments.append(dept)
 
@@ -117,8 +119,12 @@ def add_teacher():
 def assign_expertise(teacher_id):
     """Link a teacher to a course they are qualified to teach."""
     data = request.json
-    teacher = Teacher.query.get_or_404(teacher_id)
-    course = Course.query.get_or_404(data['course_id'])
+    teacher = db.session.get(Teacher, teacher_id)
+    if not teacher:
+        return jsonify({'error': 'Teacher not found'}), 404
+    course = db.session.get(Course, data['course_id'])
+    if not course:
+        return jsonify({'error': 'Course not found'}), 404
     
     if course not in teacher.qualified_courses:
         teacher.qualified_courses.append(course)
@@ -180,7 +186,9 @@ def add_room():
 
 @resources_bp.route('/rooms/<int:room_id>', methods=['DELETE'])
 def delete_room(room_id):
-    room = Room.query.get_or_404(room_id)
+    room = db.session.get(Room, room_id)
+    if not room:
+        return jsonify({'error': 'Room not found'}), 404
     db.session.delete(room)
     db.session.commit()
     return jsonify({'message': 'Room deleted!'})

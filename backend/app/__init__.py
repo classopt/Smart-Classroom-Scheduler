@@ -9,11 +9,12 @@ jwt=JWTManager()
 
 def create_app():
     app = Flask(__name__)
-
-    # 1. Adding Some basic configurations
-
-    app.config['SQLALCHEMY_DATABASE_URI']='sqlite:///development.db'
-    app.config['JWT_SECRET_KEY']='your-secret-affair'
+    
+    # Load configuration
+    from .config import config
+    import os
+    env = os.environ.get('FLASK_ENV', 'development')
+    app.config.from_object(config[env])
 
     # 1. Initialize the Extensions with  app
 

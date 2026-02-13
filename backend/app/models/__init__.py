@@ -7,3 +7,4 @@ from .program import Program
 from .batch import Batch
 from .section import Section
 from .workload import Workload
+from .timetable import TimetableEntry
