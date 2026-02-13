@@ -52,22 +52,31 @@ jobs:
     name: frontend-build
     runs-on: ubuntu-latest
 
-    # Only run if frontend folder exists
-    if: ${{ hashFiles('frontend/package.json') != '' }}
-
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
 
+      - name: Check if frontend exists
+        id: check_frontend
+        run: |
+          if [ -d "frontend" ] && [ -f "frontend/package.json" ]; then
+            echo "frontend_exists=true" >> $GITHUB_OUTPUT
+          else
+            echo "frontend_exists=false" >> $GITHUB_OUTPUT
+          fi
+
       - name: Set up Node
+        if: steps.check_frontend.outputs.frontend_exists == 'true'
         uses: actions/setup-node@v4
         with:
           node-version: 20
 
       - name: Install frontend dependencies
+        if: steps.check_frontend.outputs.frontend_exists == 'true'
         working-directory: frontend
         run: npm install
 
       - name: Build frontend
+        if: steps.check_frontend.outputs.frontend_exists == 'true'
         working-directory: frontend
         run: npm run build
