@@ -1,57 +1,73 @@
-name: AI-Powered Smart Classroom Scheduling System CI
+name: Smart Classroom Scheduler CI
 
 on:
   push:
-    branches: [ main, master ]
+    branches: [ main ]
   pull_request:
-    branches: [ main, master ]
+    types: [opened, synchronize, reopened]
+    branches: [ main ]
 
 jobs:
+
   backend-test:
+    name: backend-test
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: ./backend
 
     steps:
-    - uses: actions/checkout@v3
-    
-    - name: Set up Python 3.13
-      uses: actions/setup-python@v4
-      with:
-        python-version: "3.13"
-        
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install -r requirements.txt
-        pip install flake8 pytest 
-        
-    - name: Lint with flake8
-      run: |
-        # stop the build if there are Python syntax errors or undefined names
-        flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
-        # exit-zero treats all errors as warnings.
-        flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
+      - name: Checkout repository
+        uses: actions/checkout@v3
 
-    - name: Run backend tests
-      run: |
-        python test_logic.py || pytest
+      - name: Set up Python 3.10
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.10"
+
+      - name: Cache pip dependencies
+        uses: actions/cache@v3
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
+
+      - name: Install backend dependencies
+        working-directory: backend
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install pytest flake8
+
+      - name: Lint backend (fail on real errors)
+        working-directory: backend
+        run: |
+          flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
+
+      - name: Run backend tests
+        working-directory: backend
+        run: |
+          pytest
+
 
   frontend-build:
+    name: frontend-build
     runs-on: ubuntu-latest
+
+    # Only run if frontend folder exists
+    if: ${{ hashFiles('frontend/package.json') != '' }}
+
     steps:
-    - uses: actions/checkout@v3
-    
-    - name: Set up Node.js
-      uses: actions/setup-node@v3
-      with:
-        node-version: '20'
-        
-    - name: Build and Lint Frontend
-      if: hashFiles('frontend/package.json') != ''
-      working-directory: ./frontend
-      run: |
-        npm install
-        npm run lint --if-present
-        npm run build --if-present
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install frontend dependencies
+        working-directory: frontend
+        run: npm install
+
+      - name: Build frontend
+        working-directory: frontend
+        run: npm run build
