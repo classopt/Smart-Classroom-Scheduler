@@ -3,7 +3,7 @@ name: PR Checks and Validation
 on:
   pull_request:
     types: [opened, synchronize, reopened]
-    branches: [main]
+    branches: [main, 'feature/*']
 
 jobs:
   frontend-tests:
@@ -136,7 +136,7 @@ jobs:
     name: Merge Protection
     runs-on: ubuntu-latest
     needs: [frontend-tests, backend-tests, code-quality, pr-validation]
-    if: github.event_name == 'pull_request'
+    if: github.event_name == 'pull_request' && github.base_ref == 'refs/heads/main'
     
     steps:
       - name: Check all required jobs passed
