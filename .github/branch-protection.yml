@@ -1,0 +1,41 @@
+# Branch Protection Rules Configuration
+# This file defines the branch protection settings for the main branch
+
+# Main Branch Protection Rules
+main:
+  # Require pull request reviews before merging
+  required_reviews:
+    required_approving_review_count: 1
+    dismiss_stale_reviews: true
+    require_code_owner_reviews: false
+    require_up_to_date_approvals: true
+  
+  # Require status checks to pass before merging
+  required_status_checks:
+    strict: true  # Require up-to-date branches
+    contexts:
+      - "PR Checks and Validation / Frontend Tests"
+      - "PR Checks and Validation / Backend Tests"
+      - "PR Checks and Validation / Code Quality Checks"
+      - "PR Checks and Validation / PR Validation"
+      - "PR Checks and Validation / Merge Protection"
+  
+  # Enforce admin restrictions
+  enforce_admins: true
+  
+  # Restrict who can push
+  restrictions:
+    users: []
+    teams: ["maintainers", "core-team"]
+  
+  # Require conversation resolution
+  require_conversation_resolution: true
+  
+  # Require linear history
+  require_linear_history: true
+  
+  # Allow force pushes
+  allow_force_pushes: false
+  
+  # Allow deletions
+  allow_deletions: false
