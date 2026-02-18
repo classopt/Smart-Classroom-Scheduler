@@ -1,0 +1,25 @@
+name: Minimal CI
+
+on:
+  push:
+    branches: [ feature/frontend-foundation ]
+  pull_request:
+    branches: [ main, feature/frontend-foundation ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          
+      - name: Test frontend build
+        working-directory: frontend
+        run: |
+          npm ci
+          npm run build
