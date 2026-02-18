@@ -1,0 +1,154 @@
+name: PR Checks and Validation
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+    branches: [main, 'feature/*']
+
+jobs:
+  frontend-tests:
+    name: Frontend Tests
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: frontend/package-lock.json
+          
+      - name: Install dependencies
+        working-directory: ./frontend
+        run: npm ci
+        
+      - name: Run tests
+        working-directory: ./frontend
+        run: npm run test
+        
+      - name: Build application
+        working-directory: ./frontend
+        run: npm run build
+        
+      - name: Check for linting errors
+        working-directory: ./frontend
+        run: npm run lint || echo "Lint check completed"
+
+  backend-tests:
+    name: Backend Tests
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+          
+      - name: Install dependencies
+        working-directory: ./backend
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          
+      - name: Run tests
+        working-directory: ./backend
+        run: python -m pytest
+        
+      - name: Check code quality
+        working-directory: ./backend
+        run: |
+          python -m flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
+          python -m flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
+
+  code-quality:
+    name: Code Quality Checks
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Check for large files
+        run: |
+          find . -type f -size +5M -not -path "./.git/*" -not -path "./node_modules/*" -not -path "./frontend/node_modules/*" | head -10
+          
+      - name: Check for secrets
+        uses: trufflesecurity/trufflehog@main
+        with:
+          base: main
+          head: HEAD
+          
+      - name: Check package.json dependencies
+        working-directory: ./frontend
+        run: |
+          npm audit --audit-level moderate
+          
+      - name: Validate configuration files
+        run: |
+          if [ -f "frontend/.env.example" ]; then
+            echo "✅ .env.example exists"
+          else
+            echo "❌ .env.example missing"
+            exit 1
+          fi
+
+  pr-validation:
+    name: PR Validation
+    runs-on: ubuntu-latest
+    needs: [frontend-tests, backend-tests, code-quality]
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Validate PR description
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const { data: pr } = await github.rest.pulls.get({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: context.issue.number
+            });
+            
+            // Check if PR has description
+            if (!pr.body || pr.body.length < 50) {
+              core.setFailed('PR description must be at least 50 characters');
+              return;
+            }
+            
+            // Check if PR title follows convention
+            const titlePattern = /^(feat|fix|docs|style|refactor|test|chore)(\(.+\))?: .+/;
+            if (!titlePattern.test(pr.title)) {
+              core.setFailed('PR title must follow conventional commit format (feat|fix|docs|style|refactor|test|chore)');
+              return;
+            }
+            
+            console.log('✅ PR validation passed');
+
+  merge-protection:
+    name: Merge Protection
+    runs-on: ubuntu-latest
+    needs: [frontend-tests, backend-tests, code-quality, pr-validation]
+    if: github.event_name == 'pull_request' && github.base_ref == 'refs/heads/main'
+    
+    steps:
+      - name: Check all required jobs passed
+        run: |
+          echo "✅ All checks passed - PR is ready for merge review"
+          echo "📋 Required checks:"
+          echo "  - Frontend Tests: PASSED"
+          echo "  - Backend Tests: PASSED"
+          echo "  - Code Quality: PASSED"
+          echo "  - PR Validation: PASSED"
+          echo ""
+          echo "🔒 This PR is protected by branch rules and requires:"
+          echo "  - All checks to pass"
+          echo "  - At least one code review approval"
+          echo "  - No merge conflicts"
