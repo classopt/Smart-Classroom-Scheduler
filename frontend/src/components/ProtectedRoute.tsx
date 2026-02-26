@@ -1,14 +1,10 @@
-import React, { useEffect } from "react"
-import { Navigate, useLocation } from "react-router-dom"
-import { useToast } from "./Toast"
+import React from "react"
+import { Navigate, useLocation, Outlet } from "react-router-dom"
+import { useToast } from "./ui/use-toast"
 
-interface ProtectedRouteProps {
-  children: React.ReactNode
-}
-
-export default function ProtectedRoute({ children }: ProtectedRouteProps) {
+export default function ProtectedRoute() {
   const location = useLocation()
-  const { addToast } = useToast()
+  const { toast } = useToast()
 
   // TODO: Implement actual authentication check
   // For now, we'll simulate authentication
@@ -16,17 +12,17 @@ export default function ProtectedRoute({ children }: ProtectedRouteProps) {
 
   React.useEffect(() => {
     if (!isAuthenticated) {
-      addToast({
+      toast({
         title: "Authentication Required",
         description: "Please login to access this page",
-        variant: "warning"
+        variant: "destructive"
       })
     }
-  }, [isAuthenticated, addToast])
+  }, [isAuthenticated, toast])
 
   if (!isAuthenticated) {
     return <Navigate to="/login" state={{ from: location }} replace />
   }
 
-  return <>{children}</>
+  return <Outlet />
 }
