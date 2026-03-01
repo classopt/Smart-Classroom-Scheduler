@@ -1,147 +1,80 @@
 import { createBrowserRouter } from "react-router-dom"
-import AppLayout from "./layouts/AppLayout"
+import App from "./App"
+import LandingPage from "./pages/LandingPage"
 import LoginPage from "./pages/auth/Login"
 import RegisterPage from "./pages/auth/Register"
 import DashboardPage from "./pages/dashboard/Dashboard"
 import ProtectedRoute from "./components/ProtectedRoute"
-
-// Department pages
 import DepartmentList from "./pages/departments/DepartmentList"
 import DepartmentDetail from "./pages/departments/DepartmentDetail"
-
-// Teacher pages
 import TeacherList from "./pages/teachers/TeacherList"
-import TeacherDetail from "./pages/teachers/TeacherDetail"
-
-// Course pages
 import CourseList from "./pages/courses/CourseList"
-import CourseDetail from "./pages/courses/CourseDetail"
-
-// Room pages
 import RoomList from "./pages/rooms/RoomList"
-import RoomDetail from "./pages/rooms/RoomDetail"
-
-// Scheduling pages
 import SchedulingDashboard from "./pages/scheduling/SchedulingDashboard"
 import WorkloadManagement from "./pages/scheduling/WorkloadManagement"
 import GenerateTimetable from "./pages/scheduling/GenerateTimetable"
 import ViewTimetable from "./pages/scheduling/ViewTimetable"
 
-// Analytics pages
-import AnalyticsDashboard from "./pages/analytics/AnalyticsDashboard"
-
 export const router = createBrowserRouter([
   {
     path: "/",
-    element: <AppLayout />,
+    element: <App />,
     children: [
-      // Auth routes
       {
-        path: "login",
-        element: <LoginPage />,
+        index: true,
+        element: <LandingPage />
       },
       {
-        path: "register",
-        element: <RegisterPage />,
+        path: "app/login",
+        element: <LoginPage />
       },
-      
-      // Protected routes
       {
+        path: "app/register",
+        element: <RegisterPage />
+      },
+      {
+        path: "app",
         element: <ProtectedRoute />,
         children: [
-          // Dashboard
           {
             path: "dashboard",
             element: <DashboardPage />,
           },
-          
-          // Department management
           {
             path: "departments",
-            children: [
-              {
-                index: true,
-                element: <DepartmentList />,
-              },
-              {
-                path: ":id",
-                element: <DepartmentDetail />,
-              },
-            ],
+            element: <DepartmentList />,
           },
-          
-          // Teacher management
+          {
+            path: "departments/:id",
+            element: <DepartmentDetail />,
+          },
           {
             path: "teachers",
-            children: [
-              {
-                index: true,
-                element: <TeacherList />,
-              },
-              {
-                path: ":id",
-                element: <TeacherDetail />,
-              },
-            ],
+            element: <TeacherList />,
           },
-          
-          // Course management
           {
             path: "courses",
-            children: [
-              {
-                index: true,
-                element: <CourseList />,
-              },
-              {
-                path: ":id",
-                element: <CourseDetail />,
-              },
-            ],
+            element: <CourseList />,
           },
-          
-          // Room management
           {
             path: "rooms",
-            children: [
-              {
-                index: true,
-                element: <RoomList />,
-              },
-              {
-                path: ":id",
-                element: <RoomDetail />,
-              },
-            ],
+            element: <RoomList />,
           },
-          
-          // Scheduling
           {
             path: "scheduling",
-            children: [
-              {
-                index: true,
-                element: <SchedulingDashboard />,
-              },
-              {
-                path: "workload",
-                element: <WorkloadManagement />,
-              },
-              {
-                path: "generate",
-                element: <GenerateTimetable />,
-              },
-              {
-                path: "view/:scheduleId",
-                element: <ViewTimetable />,
-              },
-            ],
+            element: <SchedulingDashboard />,
           },
-          
-          // Analytics
           {
-            path: "analytics",
-            element: <AnalyticsDashboard />,
+            path: "scheduling/workload",
+            element: <WorkloadManagement />,
+          },
+          {
+            path: "scheduling/generate",
+            element: <GenerateTimetable />,
+          },
+          {
+            path: "scheduling/view",
+            element: <ViewTimetable />,
           },
         ],
       },
