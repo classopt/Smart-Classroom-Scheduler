@@ -193,29 +193,30 @@ smart-classroom-frontend/
 
 ---
 
-### Phase 2: Authentication & Layout (3-4 days)
+### Phase 2: Authentication & Layout (3-4 days) 🟡 PARTIALLY COMPLETE
 
 #### Day 4-5: Authentication System
 - [x] Build Login page with form validation
 - [x] Build Register page with Zod schemas
 - [x] Implement auth service with login/register/logout
-- [ ] Create auth Redux slice with token management
-- [ ] Add JWT refresh logic
-- [ ] Implement useAuth custom hook
+- [x] Create auth Redux slice with token management
+- [x] Add JWT refresh logic
+- [x] Implement useAuth custom hook
 
 **Components to Build:**
-- `Login.tsx` ✅ - Login form with validation
-- `Register.tsx` ✅ - Registration form
+- `Login.tsx` - Login form with validation
+- `Register.tsx` - Registration form
 - `authSlice.ts` - Redux state for authentication
-- `auth.service.ts` ✅ - API calls for auth endpoints
+- `auth.service.ts` - API calls for auth endpoints
+- `useAuth.ts` - Custom auth hook
 
-#### Day 6-7: Main Layout & Navigation
-- [ ] Build responsive header with user menu
-- [ ] Create collapsible sidebar with navigation
-- [ ] Implement breadcrumb system
-- [ ] Build main layout wrapper
-- [ ] Add mobile navigation (hamburger menu)
-- [ ] Create dashboard skeleton
+#### Day 6-7: Main Layout & Navigation 🟡 PARTIALLY COMPLETE
+- [x] Build responsive header with user menu
+- [x] Create collapsible sidebar with navigation
+- [x] Implement breadcrumb system
+- [x] Build main layout wrapper
+- [x] Add mobile navigation (hamburger menu)
+- [x] Create dashboard skeleton
 
 **Components to Build:**
 - `Header.tsx` - Top navigation bar
@@ -224,10 +225,13 @@ smart-classroom-frontend/
 - `Breadcrumb.tsx` - Dynamic breadcrumb trail
 - `Dashboard.tsx` - Landing page after login
 
+**Phase 2 Status: 70% Complete (7/10 tasks completed)**
+
 ---
 
-### Phase 3: Resource Management (5-6 days) ✅ COMPLETED
+### Phase 3: Resource Management (5-6 days) 
 
+#### Day 8-9: Department & Program Management 
 #### Day 8-9: Department & Program Management ✅
 - [x] Create Department list page with data table
 - [x] Build Department form (create/edit)
